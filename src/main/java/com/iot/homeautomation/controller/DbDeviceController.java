@@ -4,11 +4,12 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.*;
 
 @RestController
-@CrossOrigin(origins = "*")   // 🔥 ADD THIS
+@CrossOrigin(origins = "*")   // 🔥 Allow all clients (mobile, dashboard)
 public class DbDeviceController {
 
     private Connection con;
 
+    // 🔥 DB CONNECTION (PostgreSQL)
     public DbDeviceController() {
         try {
             Class.forName("org.postgresql.Driver");
@@ -20,15 +21,46 @@ public class DbDeviceController {
             );
 
             con.setAutoCommit(true);
-            System.out.println("DB Connected");
+            System.out.println("PostgreSQL Connected ✅");
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    // 🔥 CONTROL API (TURN ON / OFF)
+    @GetMapping("/control")
+    public String control(
+            @RequestParam String action,
+            @RequestParam String device) {
+
+        try {
+            PreparedStatement pstmt = con.prepareStatement(
+                "UPDATE iotDeviceStatus SET status=? WHERE device=?"
+            );
+
+            pstmt.setString(1, action.toUpperCase());
+            pstmt.setString(2, device);
+
+            int rows = pstmt.executeUpdate();
+            pstmt.close();
+
+            if (rows > 0) {
+                return "Device " + device + " " + action;
+            } else {
+                return "Device not found";
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error";
+        }
+    }
+
+    // 🔥 STATUS API (GET ALL DEVICE STATUS)
     @GetMapping("/status")
     public String status() {
+
         String result = "";
 
         try {
