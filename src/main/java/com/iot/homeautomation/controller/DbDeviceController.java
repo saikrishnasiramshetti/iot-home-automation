@@ -14,14 +14,13 @@ public class DbDeviceController {
     // 🔥 Constructor (like init())
     public DbDeviceController() {
         try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
+        	Class.forName("org.postgresql.Driver");
 
-            con = DriverManager.getConnection(
-                    "jdbc:oracle:thin:@localhost:1521:orcl",
-                    "system",
-                    "saikrishna"
-            );
-
+        	con = DriverManager.getConnection(
+        	    "jdbc:postgresql://dpg-d7b6v98ule4c738sp9e0-a.oregon-postgres.render.com:5432/iot_db_veg6",
+        	    "iotdb_gz1n_user",
+        	    "iVuN78UhB0AwMGhhajDTrczGgZBB66J4"
+        	);
             con.setAutoCommit(true);
 
             System.out.println("DB Connected");

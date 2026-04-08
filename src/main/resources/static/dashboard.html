@@ -54,7 +54,9 @@ function loadStatus(){
   if(isLoading) return;
   isLoading = true;
 
-  fetch("http://localhost:8080/status")
+fetch("https://iot-home-automation-2.onrender.com/status")
+//fetch("https://iot-home-automation-2.onrender.com/status")
+  //fetch("http://localhost:8080/status")
   .then(res => res.text())
   .then(data => {
 
