@@ -74,9 +74,10 @@ button{
 
 <script>
 
-// ✅ NOW WE USE LOCAL SPRING BOOT API
-let baseURL = "http://localhost:8080";
+// 🔥 IMPORTANT: YOUR RENDER BACKEND URL
+let baseURL = "https://iot-home-automation-2.onrender.com";
 
+// 🔹 Toggle single device
 function toggle(button, device){
   if(button.classList.contains("off")){
     button.classList.replace("off","on");
@@ -89,14 +90,15 @@ function toggle(button, device){
   }
 }
 
+// 🔹 Send request to backend
 function send(action, device){
-  
   fetch(baseURL + "/control?action=" + action + "&device=" + device)
   .then(res => res.text())
   .then(data => console.log(data))
   .catch(err => console.log("Error:", err));
 }
 
+// 🔹 ALL ON
 function allOn(){
   let buttons = document.querySelectorAll(".device-btn");
 
@@ -105,10 +107,11 @@ function allOn(){
       btn.classList.replace("off","on");
       btn.innerText = "ON";
       send("on", index + 1);
-    }, index * 300);
+    }, index * 200);
   });
 }
 
+// 🔹 ALL OFF
 function allOff(){
   let buttons = document.querySelectorAll(".device-btn");
 
@@ -117,18 +120,13 @@ function allOff(){
       btn.classList.replace("on","off");
       btn.innerText = "OFF";
       send("off", index + 1);
-    }, index * 300);
+    }, index * 200);
   });
 }
 
-
-
-
-
-
+// 🔥 LOAD CURRENT STATUS (IMPORTANT)
 function loadStatus(){
-
-  fetch("http://localhost:8080/status")
+  fetch(baseURL + "/status")
   .then(res => res.text())
   .then(data => {
 
@@ -159,11 +157,14 @@ function loadStatus(){
   .catch(err => console.log("Error:", err));
 }
 
+// 🔥 AUTO LOAD + SYNC
 window.onload = function(){
   loadStatus();
 }
 
-setInterval(loadStatus, 5000);
+// 🔥 AUTO REFRESH EVERY 3 SEC
+setInterval(loadStatus, 3000);
+
 </script>
 
 </body>
