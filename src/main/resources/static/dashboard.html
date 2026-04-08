@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Device Dashboard</title>
+
+<style>
+body{
+  font-family: Arial;
+  text-align: center;
+}
+
+.container{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap:20px;
+  margin-top:20px;
+}
+
+img{
+  width:120px;
+  height:120px;
+  filter: grayscale(100%);
+  transition: 0.5s ease;
+}
+
+p{
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>DEVICE STATUS DASHBOARD</h1>
+
+<div class="container">
+  <div><img id="d1" src="light.png"><p>LIGHT 1</p></div>
+  <div><img id="d2" src="light.png"><p>LIGHT 2</p></div>
+  <div><img id="d3" src="fan.png"><p>FAN 1</p></div>
+  <div><img id="d4" src="fan.png"><p>FAN 2</p></div>
+  <div><img id="d5" src="tv.png"><p>TV</p></div>
+  <div><img id="d6" src="heater.png"><p>HEATER</p></div>
+  <div><img id="d7" src="motor.png"><p>MOTOR</p></div>
+  <div><img id="d8" src="ac.png"><p>AC</p></div>
+</div>
+
+<script>
+
+let isLoading = false;
+
+// ✅ LOAD STATUS FROM SPRING BOOT
+function loadStatus(){
+
+  if(isLoading) return;
+  isLoading = true;
+
+  fetch("http://localhost:8080/status")
+  .then(res => res.text())
+  .then(data => {
+
+    console.log("DATA:", data);
+
+    let devices = data.split(",");
+
+    devices.forEach(item => {
+
+      if(item.trim() === "") return;
+
+      let parts = item.split(":");
+
+      let device = parts[0].trim();
+      let status = parts[1].trim();
+
+      let img = document.getElementById("d" + device);
+
+      if(img){
+        if(status === "ON"){
+          img.style.filter = "grayscale(0%)";   // ON → color
+        } else {
+          img.style.filter = "grayscale(100%)"; // OFF → B/W
+        }
+      }
+
+    });
+
+  })
+  .catch(err => console.log("Error:", err))
+  .finally(() => {
+    isLoading = false;
+  });
+}
+
+// ✅ AUTO LOAD
+window.onload = function(){
+  loadStatus();
+  setInterval(loadStatus, 5000);
+}
+
+</script>
+
+</body>
+</html>

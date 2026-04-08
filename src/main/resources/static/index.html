@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Home Automation</title>
+
+<style>
+body{
+  background: radial-gradient(circle,#cc00ff,#cc66ff,#99ffcc);
+  font-family: Arial;
+}
+
+.container{
+  width:500px;
+  margin:auto;
+  padding:20px;
+  background: radial-gradient(circle,#ffff00,#66ff66,#99ccff);
+  text-align:center;
+  border-radius:20px;
+}
+
+h1{
+  text-align:center;
+}
+
+button{
+  width:120px;
+  height:50px;
+  border-radius:50px;
+  border:none;
+  color:white;
+  font-weight:bold;
+  margin:8px;
+  cursor:pointer;
+}
+
+.on{
+  background-color:#006633;
+}
+
+.off{
+  background-color:#cc0000;
+}
+
+.allbtn{
+  background-color:#0033ff;
+  width:110px;
+  height:45px;
+}
+</style>
+</head>
+
+<body>
+
+<h1>HOME AUTOMATION</h1>
+
+<div class="container">
+
+<button class="device-btn off" onclick="toggle(this,1)">OFF</button>
+<button class="device-btn off" onclick="toggle(this,2)">OFF</button><br><br>
+
+<button class="device-btn off" onclick="toggle(this,3)">OFF</button>
+<button class="device-btn off" onclick="toggle(this,4)">OFF</button><br><br>
+
+<button class="device-btn off" onclick="toggle(this,5)">OFF</button>
+<button class="device-btn off" onclick="toggle(this,6)">OFF</button><br><br>
+
+<button class="device-btn off" onclick="toggle(this,7)">OFF</button>
+<button class="device-btn off" onclick="toggle(this,8)">OFF</button><br><br>
+
+<button class="allbtn" onclick="allOn()">ALL ON</button>
+<button class="allbtn" onclick="allOff()">ALL OFF</button>
+
+</div>
+
+<script>
+
+// ✅ NOW WE USE LOCAL SPRING BOOT API
+let baseURL = "http://localhost:8080";
+
+function toggle(button, device){
+  if(button.classList.contains("off")){
+    button.classList.replace("off","on");
+    button.innerText="ON";
+    send("on", device);
+  }else{
+    button.classList.replace("on","off");
+    button.innerText="OFF";
+    send("off", device);
+  }
+}
+
+function send(action, device){
+  
+  fetch(baseURL + "/control?action=" + action + "&device=" + device)
+  .then(res => res.text())
+  .then(data => console.log(data))
+  .catch(err => console.log("Error:", err));
+}
+
+function allOn(){
+  let buttons = document.querySelectorAll(".device-btn");
+
+  buttons.forEach((btn, index) => {
+    setTimeout(() => {
+      btn.classList.replace("off","on");
+      btn.innerText = "ON";
+      send("on", index + 1);
+    }, index * 300);
+  });
+}
+
+function allOff(){
+  let buttons = document.querySelectorAll(".device-btn");
+
+  buttons.forEach((btn, index) => {
+    setTimeout(() => {
+      btn.classList.replace("on","off");
+      btn.innerText = "OFF";
+      send("off", index + 1);
+    }, index * 300);
+  });
+}
+
+
+
+
+
+
+function loadStatus(){
+
+  fetch("http://localhost:8080/status")
+  .then(res => res.text())
+  .then(data => {
+
+    let buttons = document.querySelectorAll(".device-btn");
+    let devices = data.split(",");
+
+    devices.forEach(item => {
+
+      if(item.trim() === "") return;
+
+      let parts = item.split(":");
+      let device = parseInt(parts[0]) - 1;
+      let status = parts[1];
+
+      if(status === "ON"){
+        buttons[device].classList.remove("off");
+        buttons[device].classList.add("on");
+        buttons[device].innerText = "ON";
+      } else {
+        buttons[device].classList.remove("on");
+        buttons[device].classList.add("off");
+        buttons[device].innerText = "OFF";
+      }
+
+    });
+
+  })
+  .catch(err => console.log("Error:", err));
+}
+
+window.onload = function(){
+  loadStatus();
+}
+
+setInterval(loadStatus, 5000);
+</script>
+
+</body>
+</html>
