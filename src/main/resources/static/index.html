@@ -74,9 +74,7 @@ button{
 
 <script>
 
-
 let baseURL = "https://iot-home-automation-2.onrender.com";
-
 
 function toggle(button, device){
   if(button.classList.contains("off")){
@@ -90,14 +88,14 @@ function toggle(button, device){
   }
 }
 
-
 function send(action, device){
-  fetch(baseURL + "/control?action=" + action + "&device=" + device)
+  fetch(baseURL + "/control?action=" + action + "&device=" + device, {
+    cache: "no-store"
+  })
   .then(res => res.text())
   .then(data => console.log(data))
   .catch(err => console.log("Error:", err));
 }
-
 
 function allOn(){
   let buttons = document.querySelectorAll(".device-btn");
@@ -111,7 +109,6 @@ function allOn(){
   });
 }
 
-
 function allOff(){
   let buttons = document.querySelectorAll(".device-btn");
 
@@ -124,9 +121,10 @@ function allOff(){
   });
 }
 
-
 function loadStatus(){
-  fetch(baseURL + "/status")
+  fetch(baseURL + "/status?time=" + new Date().getTime(), {
+    cache: "no-store"
+  })
   .then(res => res.text())
   .then(data => {
 
@@ -157,14 +155,16 @@ function loadStatus(){
   .catch(err => console.log("Error:", err));
 }
 
+// Run once when page loads
 window.onload = function(){
   loadStatus();
 }
 
-
+// Auto refresh every 1 second
 setInterval(loadStatus, 1000);
 
 </script>
 
 </body>
 </html>
+
