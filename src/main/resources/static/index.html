@@ -74,10 +74,10 @@ button{
 
 <script>
 
-// 🔥 IMPORTANT: YOUR RENDER BACKEND URL
+
 let baseURL = "https://iot-home-automation-2.onrender.com";
 
-// 🔹 Toggle single device
+
 function toggle(button, device){
   if(button.classList.contains("off")){
     button.classList.replace("off","on");
@@ -90,7 +90,7 @@ function toggle(button, device){
   }
 }
 
-// 🔹 Send request to backend
+
 function send(action, device){
   fetch(baseURL + "/control?action=" + action + "&device=" + device)
   .then(res => res.text())
@@ -98,7 +98,7 @@ function send(action, device){
   .catch(err => console.log("Error:", err));
 }
 
-// 🔹 ALL ON
+
 function allOn(){
   let buttons = document.querySelectorAll(".device-btn");
 
@@ -111,7 +111,7 @@ function allOn(){
   });
 }
 
-// 🔹 ALL OFF
+
 function allOff(){
   let buttons = document.querySelectorAll(".device-btn");
 
@@ -124,7 +124,7 @@ function allOff(){
   });
 }
 
-// 🔥 LOAD CURRENT STATUS (IMPORTANT)
+
 function loadStatus(){
   fetch(baseURL + "/status")
   .then(res => res.text())
@@ -157,13 +157,12 @@ function loadStatus(){
   .catch(err => console.log("Error:", err));
 }
 
-// 🔥 AUTO LOAD + SYNC
 window.onload = function(){
   loadStatus();
 }
 
-// 🔥 AUTO REFRESH EVERY 3 SEC
-setInterval(loadStatus, 3000);
+
+setInterval(loadStatus, 1000);
 
 </script>
 
