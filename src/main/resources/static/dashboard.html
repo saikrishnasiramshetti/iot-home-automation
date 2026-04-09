@@ -26,6 +26,17 @@ img{
 p{
   font-weight:bold;
 }
+
+/* 🔥 BLINK EFFECT */
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+.fan-blink {
+  animation: blink 0.5s infinite;
+}
 </style>
 </head>
 
@@ -48,17 +59,15 @@ p{
 
 let isLoading = false;
 
-// ✅ LOAD STATUS FROM SPRING BOOT
+// 🔥 Track state (ON/OFF)
+let deviceState = {};
+
 function loadStatus(){
 
   if(isLoading) return;
   isLoading = true;
   
   fetch("https://iot-home-automation-2.onrender.com/status")
-
-//fetch("https://iot-home-automation-2.onrender.com/status")
-//fetch("https://iot-home-automation-2.onrender.com/status")
-  //fetch("http://localhost:8080/status")
   .then(res => res.text())
   .then(data => {
 
@@ -73,16 +82,43 @@ function loadStatus(){
       let parts = item.split(":");
 
       let device = parts[0].trim();
-      let status = parts[1].trim();
+      let status = parts[1].trim().toUpperCase();
 
       let img = document.getElementById("d" + device);
 
       if(img){
+
         if(status === "ON"){
-          img.style.filter = "grayscale(0%)";   // ON → color
+
+          img.style.filter = "grayscale(0%)";
+
+          // 🔥 FAN ONLY (d3, d4)
+          if(device === "3" || device === "4"){
+
+            // Only blink when OFF → ON
+            if(deviceState[device] !== "ON"){
+
+              deviceState[device] = "ON";
+
+              img.classList.add("fan-blink");
+
+              setTimeout(() => {
+                img.classList.remove("fan-blink");
+              }, 3000);
+            }
+
+          }
+
         } else {
-          img.style.filter = "grayscale(100%)"; // OFF → B/W
+
+          img.style.filter = "grayscale(100%)";
+          img.classList.remove("fan-blink");
+
+          // mark OFF
+          deviceState[device] = "OFF";
+
         }
+
       }
 
     });
@@ -94,10 +130,9 @@ function loadStatus(){
   });
 }
 
-// ✅ AUTO LOAD
 window.onload = function(){
   loadStatus();
-  setInterval(loadStatus, 5000);
+  setInterval(loadStatus, 5000); // ✅ keep 5 seconds
 }
 
 </script>
